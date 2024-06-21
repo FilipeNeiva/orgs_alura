@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
+import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityDetalheProdutoBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
@@ -14,6 +15,7 @@ import java.util.Locale
 
 @Suppress("DEPRECATION")
 class DetalheProdutoActivity : AppCompatActivity() {
+    private lateinit var produto: Produto
     private val binding by lazy {
         ActivityDetalheProdutoBinding.inflate(layoutInflater)
     }
@@ -30,13 +32,19 @@ class DetalheProdutoActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_detalhes_produto_editar -> {
-                Log.i("TESTE", "Editar")
-            }
 
-            R.id.menu_detalhes_produto_remover -> {
-                Log.i("TESTE", "Remover")
+        if (::produto.isInitialized) {
+            val db = AppDatabase.instance(this)
+            val produtoDao = db.produtoDao()
+            when (item.itemId) {
+                R.id.menu_detalhes_produto_editar -> {
+                    Log.i("TESTE", "Editar")
+                }
+
+                R.id.menu_detalhes_produto_remover -> {
+                    produtoDao.remove(produto)
+                    finish()
+                }
             }
         }
         return super.onOptionsItemSelected(item)
@@ -44,11 +52,12 @@ class DetalheProdutoActivity : AppCompatActivity() {
 
     private fun initView() {
         val produtoParcelable = intent.getParcelableExtra<Produto>("produto")
-        produtoParcelable?.let { produto ->
-            binding.activityDetailValor.setText(formataMoedaBrasileira(produto))
-            binding.activityDetailTitle.setText(produto.nome)
-            binding.activityDetailDescricao.setText(produto.descricao)
-            binding.activityDetailImage.tentaCarregarImagem(produto.url)
+        produtoParcelable?.let { produtoCarregado ->
+            produto = produtoCarregado
+            binding.activityDetailValor.text = formataMoedaBrasileira(produtoCarregado)
+            binding.activityDetailTitle.text = produtoCarregado.nome
+            binding.activityDetailDescricao.text = produtoCarregado.descricao
+            binding.activityDetailImage.tentaCarregarImagem(produtoCarregado.url)
         }
     }
 

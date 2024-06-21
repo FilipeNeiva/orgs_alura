@@ -11,11 +11,13 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
+import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.activity.DetalheProdutoActivity
 import coil.load
+import okhttp3.internal.notify
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -29,7 +31,7 @@ class ListaProdutosAdapter(
     class ViewHolder(private val binding: ProdutoItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun vincula(produto: Produto) {
+        fun vincula(produto: Produto, context: ListaProdutosAdapter) {
             val nome = binding.produtoItemNome
             nome.text = produto.nome
             val descricao = binding.produtoItemDescricao
@@ -61,6 +63,9 @@ class ListaProdutosAdapter(
 
                 popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener{
                     override fun onMenuItemClick(item: MenuItem?): Boolean {
+                        val db = AppDatabase.instance(it.context)
+                        val produtoDao = db.produtoDao()
+
                         when (item?.itemId) {
                             R.id.menu_detalhes_produto_editar -> {
                                 Log.i("TESTE", "Editar")
@@ -68,8 +73,9 @@ class ListaProdutosAdapter(
                             }
 
                             R.id.menu_detalhes_produto_remover -> {
-                                Log.i("TESTE", "Remover")
-
+                                produtoDao.remove(produto)
+                                context.produtos.remove(produto)
+                                context.notifyDataSetChanged()
                             }
                         }
                         return false
@@ -95,7 +101,7 @@ class ListaProdutosAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val produto = produtos[position]
-        holder.vincula(produto)
+        holder.vincula(produto, this)
     }
 
     override fun getItemCount(): Int = produtos.size

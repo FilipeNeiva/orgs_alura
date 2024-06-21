@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
@@ -16,14 +15,11 @@ import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.activity.DetalheProdutoActivity
-import coil.load
-import okhttp3.internal.notify
 import java.text.NumberFormat
 import java.util.Locale
 
 class ListaProdutosAdapter(
-    private val context: Context,
-    produtos: List<Produto> = emptyList()
+    private val context: Context, produtos: List<Produto> = emptyList()
 ) : RecyclerView.Adapter<ListaProdutosAdapter.ViewHolder>() {
 
     private val produtos = produtos.toMutableList()
@@ -51,8 +47,7 @@ class ListaProdutosAdapter(
             holder.setOnClickListener {
 
                 val intent = Intent(it.context, DetalheProdutoActivity::class.java).putExtra(
-                    "produto",
-                    produto
+                    "produto", produto
                 )
                 it.context.startActivity(intent)
             }
@@ -61,7 +56,7 @@ class ListaProdutosAdapter(
                 val popupMenu = PopupMenu(it.context, it)
                 popupMenu.inflate(R.menu.menu_detalhes_produto)
 
-                popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener{
+                popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
                     override fun onMenuItemClick(item: MenuItem?): Boolean {
                         val db = AppDatabase.instance(it.context)
                         val produtoDao = db.produtoDao()

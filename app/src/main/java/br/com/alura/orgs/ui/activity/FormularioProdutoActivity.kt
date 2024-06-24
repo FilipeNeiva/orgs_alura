@@ -1,5 +1,6 @@
 package br.com.alura.orgs.ui.activity
 
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
@@ -15,6 +16,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
     private var url: String? = null
+    private var idProduto = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,11 +25,19 @@ class FormularioProdutoActivity : AppCompatActivity() {
         configuraBotaoSalvar()
 
         binding.activityFormularioProdutoImagem.setOnClickListener {
-            FormularioImagemDialog(this).monstra(url) {imagem: String ->
+            FormularioImagemDialog(this).monstra(url) { imagem: String ->
                 url = imagem
                 binding.activityFormularioProdutoImagem.tentaCarregarImagem(url)
             }
         }
+
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) intent.getParcelableExtra(
+            "produto",
+            Produto::class.java
+        )?.let { produtoCarregado -> carregandoDados(produtoCarregado) }
+        else intent.getParcelableExtra<Produto>("produto")
+            ?.let { produtoCarregado -> carregandoDados(produtoCarregado) }
     }
 
     private fun configuraBotaoSalvar() {
@@ -35,9 +45,24 @@ class FormularioProdutoActivity : AppCompatActivity() {
         val dao = AppDatabase.instance(this)
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
-            dao.produtoDao().salva(produtoNovo)
+            if (idProduto > 0) {
+                dao.produtoDao().atualiza(produtoNovo)
+            } else {
+                dao.produtoDao().salva(produtoNovo)
+            }
             finish()
         }
+    }
+
+    private fun carregandoDados(produto: Produto) {
+        title = "Alterar Produto"
+
+        idProduto = produto.id
+        url = produto.url
+        binding.activityFormularioProdutoImagem.tentaCarregarImagem(produto.url)
+        binding.activityFormularioProdutoNome.setText(produto.nome)
+        binding.activityFormularioProdutoDescricao.setText(produto.descricao)
+        binding.activityFormularioProdutoValor.setText(produto.valor.toPlainString())
     }
 
     private fun criaProduto(): Produto {
@@ -54,6 +79,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         }
 
         return Produto(
+            id = idProduto,
             nome = nome,
             descricao = descricao,
             valor = valor,

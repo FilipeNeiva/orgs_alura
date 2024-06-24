@@ -2,7 +2,6 @@ package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +14,7 @@ import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.activity.DetalheProdutoActivity
+import br.com.alura.orgs.ui.activity.FormularioProdutoActivity
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -63,8 +63,10 @@ class ListaProdutosAdapter(
 
                         when (item?.itemId) {
                             R.id.menu_detalhes_produto_editar -> {
-                                Log.i("TESTE", "Editar")
-
+                                Intent(it.context, FormularioProdutoActivity::class.java).apply {
+                                    putExtra("produto", produto)
+                                    it.context.startActivity(this)
+                                }
                             }
 
                             R.id.menu_detalhes_produto_remover -> {

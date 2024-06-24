@@ -2,7 +2,6 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -16,15 +15,30 @@ import java.util.Locale
 
 @Suppress("DEPRECATION")
 class DetalheProdutoActivity : AppCompatActivity() {
-    private lateinit var produto: Produto
+    private var produtoId: Long? = null
+    private var produto: Produto? = null
     private val binding by lazy {
         ActivityDetalheProdutoBinding.inflate(layoutInflater)
+    }
+    private val produtoDao by lazy {
+        AppDatabase.instance(this).produtoDao()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        produtoId?.let { id ->
+            produto = produtoDao.buscaPorId(id)
+        }
+
+        produto?.let {
+            preencheCampos(it)
+        } ?: finish()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -34,9 +48,7 @@ class DetalheProdutoActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (::produto.isInitialized) {
-            val db = AppDatabase.instance(this)
-            val produtoDao = db.produtoDao()
+        if (produto != null) {
             when (item.itemId) {
                 R.id.menu_detalhes_produto_editar -> {
                     Intent(this, FormularioProdutoActivity::class.java).apply {
@@ -46,7 +58,7 @@ class DetalheProdutoActivity : AppCompatActivity() {
                 }
 
                 R.id.menu_detalhes_produto_remover -> {
-                    produtoDao.remove(produto)
+                    produto?.let { produtoDao.remove(it) }
                     finish()
                 }
             }
@@ -58,11 +70,15 @@ class DetalheProdutoActivity : AppCompatActivity() {
         val produtoParcelable = intent.getParcelableExtra<Produto>("produto")
         produtoParcelable?.let { produtoCarregado ->
             produto = produtoCarregado
-            binding.activityDetailValor.text = formataMoedaBrasileira(produtoCarregado)
-            binding.activityDetailTitle.text = produtoCarregado.nome
-            binding.activityDetailDescricao.text = produtoCarregado.descricao
-            binding.activityDetailImage.tentaCarregarImagem(produtoCarregado.url)
+            produtoId = produtoCarregado.id
         }
+    }
+
+    private fun preencheCampos(produto: Produto) {
+        binding.activityDetailValor.text = formataMoedaBrasileira(produto)
+        binding.activityDetailTitle.text = produto.nome
+        binding.activityDetailDescricao.text = produto.descricao
+        binding.activityDetailImage.tentaCarregarImagem(produto.url)
     }
 
     private fun formataMoedaBrasileira(produto: Produto): String? {

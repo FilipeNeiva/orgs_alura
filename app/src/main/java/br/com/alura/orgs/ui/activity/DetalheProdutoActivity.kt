@@ -13,9 +13,8 @@ import br.com.alura.orgs.model.Produto
 import java.text.NumberFormat
 import java.util.Locale
 
-@Suppress("DEPRECATION")
 class DetalheProdutoActivity : AppCompatActivity() {
-    private var produtoId: Long? = null
+    private var produtoId: Long = 0L
     private var produto: Produto? = null
     private val binding by lazy {
         ActivityDetalheProdutoBinding.inflate(layoutInflater)
@@ -32,10 +31,11 @@ class DetalheProdutoActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        produtoId?.let { id ->
-            produto = produtoDao.buscaPorId(id)
-        }
+        buscaProduto()
+    }
 
+    private fun buscaProduto() {
+        produto = produtoDao.buscaPorId(produtoId)
         produto?.let {
             preencheCampos(it)
         } ?: finish()
@@ -52,7 +52,7 @@ class DetalheProdutoActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.menu_detalhes_produto_editar -> {
                     Intent(this, FormularioProdutoActivity::class.java).apply {
-                        putExtra("produto", produto)
+                        putExtra(CHAVE_PRODUTO_ID, produtoId)
                         startActivity(this)
                     }
                 }
@@ -66,12 +66,9 @@ class DetalheProdutoActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    @Suppress("DEPRECATION")
     private fun initView() {
-        val produtoParcelable = intent.getParcelableExtra<Produto>("produto")
-        produtoParcelable?.let { produtoCarregado ->
-            produto = produtoCarregado
-            produtoId = produtoCarregado.id
-        }
+        produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
     }
 
     private fun preencheCampos(produto: Produto) {

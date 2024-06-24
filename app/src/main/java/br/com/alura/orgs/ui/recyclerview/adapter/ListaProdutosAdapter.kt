@@ -13,6 +13,7 @@ import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import br.com.alura.orgs.ui.activity.CHAVE_PRODUTO_ID
 import br.com.alura.orgs.ui.activity.DetalheProdutoActivity
 import br.com.alura.orgs.ui.activity.FormularioProdutoActivity
 import java.text.NumberFormat
@@ -47,7 +48,7 @@ class ListaProdutosAdapter(
             holder.setOnClickListener {
 
                 val intent = Intent(it.context, DetalheProdutoActivity::class.java).putExtra(
-                    "produto", produto
+                    CHAVE_PRODUTO_ID, produto.id
                 )
                 it.context.startActivity(intent)
             }

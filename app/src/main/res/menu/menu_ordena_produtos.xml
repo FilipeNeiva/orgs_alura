@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_ordena_produto_icon"
+        android:icon="@drawable/ic_action_order"
+        android:title="Ordenar"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/menu_ordena_produto_nome_desc"
+                android:title="nome desc" />
+            <item
+                android:id="@+id/menu_ordena_produto_nome_asc"
+                android:title="nome asc" />
+            <item
+                android:id="@+id/menu_ordena_produto_descricao_desc"
+                android:title="descrição desc" />
+            <item
+                android:id="@+id/menu_ordena_produto_descricao_asc"
+                android:title="descrição asc" />
+            <item
+                android:id="@+id/menu_ordena_produto_valor_desc"
+                android:title="valor desc" />
+            <item
+                android:id="@+id/menu_ordena_produto_valor_asc"
+                android:title="valor asc" />
+            <item
+                android:id="@+id/menu_ordena_produto_sem_ordenacao"
+                android:title="sem ordenação" />
+        </menu>
+
+    </item>
+
+</menu>

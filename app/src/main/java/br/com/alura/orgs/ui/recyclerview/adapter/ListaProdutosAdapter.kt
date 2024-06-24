@@ -65,7 +65,7 @@ class ListaProdutosAdapter(
                         when (item?.itemId) {
                             R.id.menu_detalhes_produto_editar -> {
                                 Intent(it.context, FormularioProdutoActivity::class.java).apply {
-                                    putExtra("produto", produto)
+                                    putExtra(CHAVE_PRODUTO_ID, produto.id)
                                     it.context.startActivity(this)
                                 }
                             }

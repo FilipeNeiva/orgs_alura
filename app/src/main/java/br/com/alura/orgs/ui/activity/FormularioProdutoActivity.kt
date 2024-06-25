@@ -37,22 +37,19 @@ class FormularioProdutoActivity : AppCompatActivity() {
         }
 
         tentaCarregarProduto()
+
+        lifecycleScope.launch {
+            produtoDao.buscaPorId(produtoId).collect() { produto ->
+                produto?.let {
+                    title = "Alterar Produto"
+                    carregandoDados(it)
+                }
+            }
+        }
     }
 
     private fun tentaCarregarProduto() {
         produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-
-        lifecycleScope.launch {
-            produtoDao.buscaPorId(produtoId)?.let {
-                title = "Alterar Produto"
-                carregandoDados(it)
-            }
-        }
     }
 
     private fun configuraBotaoSalvar() {

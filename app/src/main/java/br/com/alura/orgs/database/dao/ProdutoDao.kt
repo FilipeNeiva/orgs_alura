@@ -22,7 +22,7 @@ interface ProdutoDao {
     suspend fun remove(produto: Produto)
 
     @Query("SELECT * FROM Produto WHERE id = :id")
-    suspend fun buscaPorId(id: Long): Produto?
+    fun buscaPorId(id: Long): Flow<Produto?>
 
     @Query("SELECT * FROM Produto ORDER BY nome DESC")
     suspend fun buscaOrdenadaNomeDesc(): List<Produto>

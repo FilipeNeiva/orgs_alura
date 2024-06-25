@@ -2,6 +2,7 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 class DetalheProdutoActivity : AppCompatActivity() {
+    private val TAG = "TESTE"
     private var produtoId: Long = 0L
     private var produto: Produto? = null
     private val binding by lazy {
@@ -29,19 +31,17 @@ class DetalheProdutoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initView()
-    }
-
-    override fun onResume() {
-        super.onResume()
         buscaProduto()
     }
 
     private fun buscaProduto() {
         lifecycleScope.launch {
-            produto = produtoDao.buscaPorId(produtoId)
-            produto?.let {
-                preencheCampos(it)
-            } ?: finish()
+            produtoDao.buscaPorId(produtoId).collect() { produtoCarregado ->
+                produtoCarregado?.let {
+                    produto = it
+                    preencheCampos(it)
+                } ?: finish()
+            }
         }
     }
 
@@ -55,6 +55,7 @@ class DetalheProdutoActivity : AppCompatActivity() {
         if (produto != null) {
             when (item.itemId) {
                 R.id.menu_detalhes_produto_editar -> {
+                    Log.i(TAG, "onOptionsItemSelected: entrou aqui")
                     Intent(this, FormularioProdutoActivity::class.java).apply {
                         putExtra(CHAVE_PRODUTO_ID, produtoId)
                         startActivity(this)

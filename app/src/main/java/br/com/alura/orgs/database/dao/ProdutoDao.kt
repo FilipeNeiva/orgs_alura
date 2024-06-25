@@ -7,37 +7,38 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import br.com.alura.orgs.model.Produto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProdutoDao {
 
     @Query("SELECT * FROM Produto")
-    fun buscaTodos(): List<Produto>
+    fun buscaTodos(): Flow<List<Produto>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun salva(vararg produto: Produto)
+    suspend fun salva(vararg produto: Produto)
 
     @Delete
-    fun remove(produto: Produto)
+    suspend fun remove(produto: Produto)
 
     @Query("SELECT * FROM Produto WHERE id = :id")
-    fun buscaPorId(id: Long): Produto?
+    suspend fun buscaPorId(id: Long): Produto?
 
     @Query("SELECT * FROM Produto ORDER BY nome DESC")
-    fun buscaOrdenadaNomeDesc(): List<Produto>
+    suspend fun buscaOrdenadaNomeDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY nome ASC")
-    fun buscaOrdenadaNomeAsc(): List<Produto>
+    suspend fun buscaOrdenadaNomeAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY descricao DESC")
-    fun buscaOrdenadaDescricaoDesc(): List<Produto>
+    suspend fun buscaOrdenadaDescricaoDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY descricao ASC")
-    fun buscaOrdenadaDescricaoAsc(): List<Produto>
+    suspend fun buscaOrdenadaDescricaoAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY valor DESC")
-    fun buscaOrdenadaValorDesc(): List<Produto>
+    suspend fun buscaOrdenadaValorDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY valor ASC")
-    fun buscaOrdenadaValorAsc(): List<Produto>
+    suspend fun buscaOrdenadaValorAsc(): List<Produto>
 }

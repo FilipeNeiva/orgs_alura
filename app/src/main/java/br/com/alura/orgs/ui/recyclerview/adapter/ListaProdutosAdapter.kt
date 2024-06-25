@@ -16,9 +16,8 @@ import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.activity.CHAVE_PRODUTO_ID
 import br.com.alura.orgs.ui.activity.DetalheProdutoActivity
 import br.com.alura.orgs.ui.activity.FormularioProdutoActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
@@ -66,7 +65,6 @@ class ListaProdutosAdapter(
                     override fun onMenuItemClick(item: MenuItem?): Boolean {
                         val db = AppDatabase.instance(it.context)
                         val produtoDao = db.produtoDao()
-                        val scope = CoroutineScope(IO)
 
                         when (item?.itemId) {
                             R.id.menu_detalhes_produto_editar -> {
@@ -77,12 +75,13 @@ class ListaProdutosAdapter(
                             }
 
                             R.id.menu_detalhes_produto_remover -> {
-                                scope.launch {
-                                    produtoDao.remove(produto)
-                                    context.produtos.remove(produto)
-                                    withContext(Dispatchers.Main) {
-                                        context.notifyDataSetChanged()
+                                MainScope().launch {
+                                    withContext(IO) {
+                                        produtoDao.remove(produto)
                                     }
+                                    context.produtos.remove(produto)
+                                    context.notifyDataSetChanged()
+
                                 }
                             }
                         }

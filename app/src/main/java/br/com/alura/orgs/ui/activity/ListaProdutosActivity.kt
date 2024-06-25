@@ -5,14 +5,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ListaProdutosActivity : AppCompatActivity() {
 
@@ -29,17 +28,11 @@ class ListaProdutosActivity : AppCompatActivity() {
         setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        val scope = MainScope()
-        scope.launch {
-            val produtos = withContext(Dispatchers.IO) {
-                produtoDao.buscaTodos()
+        lifecycleScope.launch {
+            produtoDao.buscaTodos().collect() { produtos ->
+                adapter.atualiza(produtos)
             }
-            adapter.atualiza(produtos)
         }
     }
 
@@ -52,31 +45,47 @@ class ListaProdutosActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.menu_ordena_produto_nome_desc -> {
-                adapter.atualiza(produtoDao.buscaOrdenadaNomeDesc())
+                lifecycleScope.launch {
+                    adapter.atualiza(produtoDao.buscaOrdenadaNomeDesc())
+                }
             }
 
             R.id.menu_ordena_produto_nome_asc -> {
-                adapter.atualiza(produtoDao.buscaOrdenadaNomeAsc())
+                lifecycleScope.launch {
+                    adapter.atualiza(produtoDao.buscaOrdenadaNomeAsc())
+                }
             }
 
             R.id.menu_ordena_produto_descricao_desc -> {
-                adapter.atualiza(produtoDao.buscaOrdenadaDescricaoDesc())
+                lifecycleScope.launch {
+                    adapter.atualiza(produtoDao.buscaOrdenadaDescricaoDesc())
+                }
             }
 
             R.id.menu_ordena_produto_descricao_asc -> {
-                adapter.atualiza(produtoDao.buscaOrdenadaDescricaoAsc())
+                lifecycleScope.launch {
+                    adapter.atualiza(produtoDao.buscaOrdenadaDescricaoAsc())
+                }
             }
 
             R.id.menu_ordena_produto_valor_desc -> {
-                adapter.atualiza(produtoDao.buscaOrdenadaValorDesc())
+                lifecycleScope.launch {
+                    adapter.atualiza(produtoDao.buscaOrdenadaValorDesc())
+                }
             }
 
             R.id.menu_ordena_produto_valor_asc -> {
-                adapter.atualiza(produtoDao.buscaOrdenadaValorAsc())
+                lifecycleScope.launch {
+                    adapter.atualiza(produtoDao.buscaOrdenadaValorAsc())
+                }
             }
 
             R.id.menu_ordena_produto_sem_ordenacao -> {
-                adapter.atualiza(produtoDao.buscaTodos())
+                lifecycleScope.launch {
+                    produtoDao.buscaTodos().collect() { produtos ->
+                        adapter.atualiza(produtos)
+                    }
+                }
             }
 
         }

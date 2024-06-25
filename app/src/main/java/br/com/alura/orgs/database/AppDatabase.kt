@@ -11,7 +11,7 @@ import br.com.alura.orgs.model.Produto
 
 @Database(entities = [Produto::class], version = 1)
 @TypeConverters(Converters::class)
-abstract class AppDatabase : RoomDatabase(){
+abstract class AppDatabase : RoomDatabase() {
     abstract fun produtoDao(): ProdutoDao
 
     companion object {
@@ -26,10 +26,9 @@ abstract class AppDatabase : RoomDatabase(){
                 context,
                 AppDatabase::class.java,
                 "orgs.db"
-            ).allowMainThreadQueries()
-                .build().also {
-                    db = it
-                }
+            ).build().also {
+                db = it
+            }
         }
     }
 }

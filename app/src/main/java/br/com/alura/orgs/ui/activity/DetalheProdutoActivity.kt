@@ -10,6 +10,11 @@ import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityDetalheProdutoBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -22,6 +27,7 @@ class DetalheProdutoActivity : AppCompatActivity() {
     private val produtoDao by lazy {
         AppDatabase.instance(this).produtoDao()
     }
+    private val scope = CoroutineScope(IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +41,14 @@ class DetalheProdutoActivity : AppCompatActivity() {
     }
 
     private fun buscaProduto() {
-        produto = produtoDao.buscaPorId(produtoId)
-        produto?.let {
-            preencheCampos(it)
-        } ?: finish()
+        scope.launch {
+            produto = produtoDao.buscaPorId(produtoId)
+            withContext(Main) {
+                produto?.let {
+                    preencheCampos(it)
+                } ?: finish()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -58,8 +68,10 @@ class DetalheProdutoActivity : AppCompatActivity() {
                 }
 
                 R.id.menu_detalhes_produto_remover -> {
-                    produto?.let { produtoDao.remove(it) }
-                    finish()
+                    scope.launch {
+                        produto?.let { produtoDao.remove(it) }
+                        finish()
+                    }
                 }
             }
         }

@@ -1,13 +1,17 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.database.dao.ProdutoDao
+import br.com.alura.orgs.database.dao.UsuarioDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import br.com.alura.orgs.preferences.dataStore
+import br.com.alura.orgs.preferences.usuarioLogadoPreferences
 import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -21,6 +25,9 @@ class FormularioProdutoActivity : AppCompatActivity() {
     private var produtoId = 0L
     private val produtoDao: ProdutoDao by lazy {
         AppDatabase.instance(this).produtoDao()
+    }
+    private val usuarioDao: UsuarioDao by lazy {
+        AppDatabase.instance(this).usuarioDao()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +44,16 @@ class FormularioProdutoActivity : AppCompatActivity() {
         }
 
         tentaCarregarProduto()
+
+        lifecycleScope.launch {
+            dataStore.data.collect { preferences ->
+                preferences[usuarioLogadoPreferences]?.let { usuarioId ->
+                    usuarioDao.buscaPorId(usuarioId).collect() {
+                        Log.i("FormularioProduto", "onCreate: $it")
+                    }
+                }
+            }
+        }
 
         lifecycleScope.launch {
             produtoDao.buscaPorId(produtoId).collect() { produto ->

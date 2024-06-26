@@ -35,9 +35,15 @@
     </item>
 
     <item
+        android:id="@+id/menu_lsita_produto_perfil"
+        android:icon="@drawable/ic_action_user"
+        android:title="Perfil do Usuário"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_lista_produto_sair_do_app"
         android:icon="@drawable/ic_action_sair_do_app"
         android:title="Sair do app"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
 </menu>

@@ -2,22 +2,21 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.extentions.vaiPara
-import br.com.alura.orgs.preferences.dataStore
-import br.com.alura.orgs.preferences.usuarioLogadoPreferences
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-class ListaProdutosActivity : AppCompatActivity() {
+class ListaProdutosActivity : UsuarioBaseActivity() {
 
     private val adapter = ListaProdutosAdapter(context = this)
     private val binding by lazy {
@@ -26,9 +25,7 @@ class ListaProdutosActivity : AppCompatActivity() {
     private val produtoDao by lazy {
         AppDatabase.instance(this).produtoDao()
     }
-    private val usuarioDao by lazy {
-        AppDatabase.instance(this).usuarioDao()
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,33 +36,16 @@ class ListaProdutosActivity : AppCompatActivity() {
         lifecycleScope.launch {
 
             launch {
-                verificaUsuarioLogado()
+                usuario
+                    .filterNotNull()
+                    .collect {
+                        Log.i("ListaProdutos", "onCreate: $it")
+                        buscaProdutoUsuario()
+                    }
             }
         }
     }
 
-    private suspend fun verificaUsuarioLogado() {
-        dataStore.data.collect { preferences ->
-            preferences[usuarioLogadoPreferences]?.let { usuarioId ->
-                buscaUsuario(usuarioId)
-            } ?: vaiParaLogin()
-        }
-    }
-
-    private fun buscaUsuario(usuarioId: String) {
-        lifecycleScope.launch {
-            usuarioDao.buscaPorId(usuarioId).firstOrNull()?.let {
-                launch {
-                    buscaProdutoUsuario()
-                }
-            }
-        }
-    }
-
-    private fun vaiParaLogin() {
-        vaiPara(LoginActivity::class.java)
-        finish()
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_lista_produtos, menu)
@@ -117,6 +97,10 @@ class ListaProdutosActivity : AppCompatActivity() {
                 }
             }
 
+            R.id.menu_lsita_produto_perfil -> {
+                vaiPara(PerfilUsuarioActivity::class.java)
+            }
+
             R.id.menu_lista_produto_sair_do_app -> {
                 lifecycleScope.launch {
                     deslogaUsuario()
@@ -126,12 +110,6 @@ class ListaProdutosActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    private suspend fun deslogaUsuario() {
-        dataStore.edit { preferences ->
-            preferences.remove(usuarioLogadoPreferences)
-        }
     }
 
     private suspend fun buscaProdutoUsuario() {

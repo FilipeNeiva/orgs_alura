@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|top"
+    android:orientation="vertical"
+    tools:context=".ui.activity.PerfilUsuarioActivity">
+
+    <TextView
+        android:id="@+id/perfil_usuario_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:textSize="20sp"
+        tools:text="Usuario" />
+
+    <TextView
+        android:id="@+id/perfil_usuario_nome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:textSize="25sp"
+        tools:text="Nome" />
+
+    <Button
+        android:id="@+id/perfil_usuario_botao_sair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="@color/red"
+        android:drawableLeft="@drawable/ic_action_sair_do_app"
+        android:text="Sair do app" />
+
+</LinearLayout>

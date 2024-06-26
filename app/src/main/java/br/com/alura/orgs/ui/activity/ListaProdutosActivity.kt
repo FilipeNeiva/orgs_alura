@@ -2,17 +2,14 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.extentions.vaiPara
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -38,9 +35,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
             launch {
                 usuario
                     .filterNotNull()
-                    .collect {
-                        Log.i("ListaProdutos", "onCreate: $it")
-                        buscaProdutoUsuario()
+                    .collect { usuario ->
+                        buscaProdutoUsuario(usuario.id)
                     }
             }
         }
@@ -93,7 +89,9 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
             R.id.menu_ordena_produto_sem_ordenacao -> {
                 lifecycleScope.launch {
-                    buscaProdutoUsuario()
+                    usuario.value?.let { usuario ->
+                        buscaProdutoUsuario(usuario.id)
+                    }
                 }
             }
 
@@ -112,8 +110,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private suspend fun buscaProdutoUsuario() {
-        produtoDao.buscaTodos().collect() { produtos ->
+    private suspend fun buscaProdutoUsuario(usuarioId: String) {
+        produtoDao.buscaTodosDoUsuario(usuarioId).collect() { produtos ->
             adapter.atualiza(produtos)
         }
     }

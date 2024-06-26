@@ -1,7 +1,6 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.database.dao.ProdutoDao
@@ -9,7 +8,6 @@ import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.extentions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -40,14 +38,6 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
         tentaCarregarProduto()
 
         lifecycleScope.launch {
-            usuario
-                .filterNotNull()
-                .collect {
-                    Log.i("FormularioProduto", "onCreate: $it")
-                }
-        }
-
-        lifecycleScope.launch {
             produtoDao.buscaPorId(produtoId).collect() { produto ->
                 produto?.let {
                     title = "Alterar Produto"
@@ -64,10 +54,12 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
     private fun configuraBotaoSalvar() {
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
         botaoSalvar.setOnClickListener {
-            val produtoNovo = criaProduto()
             lifecycleScope.launch {
-                produtoDao.salva(produtoNovo)
-                finish()
+                usuario.value?.let { usuario ->
+                    val produtoNovo = criaProduto(usuario.id)
+                    produtoDao.salva(produtoNovo)
+                    finish()
+                }
             }
         }
     }
@@ -85,7 +77,7 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
         binding.activityFormularioProdutoValor.setText(produto.valor.toPlainString())
     }
 
-    private fun criaProduto(): Produto {
+    private fun criaProduto(usuarioId: String): Produto {
         val campoNome = binding.activityFormularioProdutoNome
         val nome = campoNome.text.toString()
         val campoDescricao = binding.activityFormularioProdutoDescricao
@@ -103,7 +95,8 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
             nome = nome,
             descricao = descricao,
             valor = valor,
-            url = url
+            url = url,
+            usuarioId = usuarioId
         )
     }
 

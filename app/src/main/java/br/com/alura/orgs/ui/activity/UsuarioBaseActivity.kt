@@ -22,7 +22,7 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
     }
 
     private var _usuario: MutableStateFlow<Usuario?> = MutableStateFlow(null)
-    protected var usuario: StateFlow<Usuario?> = _usuario
+    protected val usuario: StateFlow<Usuario?> = _usuario
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +40,12 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun buscaUsuario(usuarioId: String) {
-        _usuario.value = usuarioDao
+    private suspend fun buscaUsuario(usuarioId: String): Usuario? {
+        return usuarioDao
             .buscaPorId(usuarioId)
-            .firstOrNull()
+            .firstOrNull().also {
+                _usuario.value = it
+            }
     }
 
     protected suspend fun deslogaUsuario() {
